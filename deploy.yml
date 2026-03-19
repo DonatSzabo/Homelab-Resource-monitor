@@ -1,0 +1,34 @@
+---
+- name: Deploy Homelab Resource Monitor to Proxmox
+  hosts: target_server       # We will define this in the inventory file
+  become: yes                # This tells Ansible to use 'sudo' for these tasks
+
+  tasks:
+    - name: 1. Ensure Git and Podman are installed
+      package:
+        name:
+          - git
+          - podman
+        state: present       # Idempotency: If they are already installed, do nothing!
+
+    - name: 2. Download the latest code from GitHub
+      git:
+        repo: 'https://github.com/DonatSzabo/Homelab-Resource-Monitor.git'
+        dest: '/opt/homelab-api'
+        update: yes          # If you push new code to Git, this pulls the updates automatically
+
+    - name: 3. Build the container image
+      command: podman build -t homelab-api .
+      args:
+        chdir: '/opt/homelab-api'
+
+    - name: 4. Stop the old container (if it exists)
+      command: podman stop my-running-api
+      ignore_errors: yes     # If this is the first time running, it will fail. We tell Ansible to ignore the error.
+
+    - name: 5. Delete the old container (if it exists)
+      command: podman rm my-running-api
+      ignore_errors: yes
+
+    - name: 6. Start the new container
+      command: podman run -d -p 8000:8000 --name my-running-api homelab-api
