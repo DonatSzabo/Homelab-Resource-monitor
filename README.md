@@ -23,5 +23,5 @@ A containerized Python microservice built with FastAPI that exposes real-time Li
 
 ## Lessons Learned & Troubleshooting
 During the deployment of this architecture, I encountered and resolved several deep-level Linux networking and hypervisor constraints:
-* **Nested Virtualization:** Bypassed Proxmox kernel restrictions by converting the target LXC from Unprivileged to Privileged, allowing Podman to properly map user-space network namespaces (`netns`) without throwing IO errors.
-* **Firewall Routing:** Diagnosed dropped TCP packets by verifying Layer 3 routing via ICMP/Ping, eliminating Tailscale exit nodes as the culprit, and ensuring the Linux kernel had IP Forwarding (`net.ipv4.ip_forward=1`) enabled to route external requests into the container's virtual network.
+* **Nested Virtualization:** Bypassed Proxmox kernel restrictions by converting the target LXC from Unprivileged to Privileged, allowing Podman to properly map user-space network namespaces without throwing IO errors.
+* **Firewall Routing:** Diagnosed dropped TCP packets by verifying Layer 3 routing via ICMP/Ping, eliminating Tailscale exit nodes as the culprit, and ensuring the Linux kernel had IP Forwarding enabled to route external requests into the container's virtual network.
